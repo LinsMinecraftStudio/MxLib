@@ -1,4 +1,4 @@
-package io.github.linsminecraftstudio.chat.input;
+package io.github.linsminecraftstudio.mxlib.chat.input;
 
 import org.bukkit.entity.Player;
 

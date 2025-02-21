@@ -1,9 +1,11 @@
-package io.github.linsminecraftstudio.chat.components;
+package io.github.linsminecraftstudio.mxlib.chat.components;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.event.ClickEvent;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class ComponentUtils {
     public static void sendClipboard(Player player, String message, String beingCopied) {
@@ -24,5 +26,17 @@ public class ComponentUtils {
         Component component = message.asComponent();
         component = component.hoverEvent(Component.text(hoverText));
         player.sendMessage(component);
+    }
+
+    public static Component getItemHoverText(ComponentLike message, ItemStack item) {
+        Component component = message.asComponent();
+        component = component.hoverEvent(item);
+        return component;
+    }
+
+    public static Component getEntityHoverText(ComponentLike message, Entity entity) {
+        Component component = message.asComponent();
+        component = component.hoverEvent(entity);
+        return component;
     }
 }

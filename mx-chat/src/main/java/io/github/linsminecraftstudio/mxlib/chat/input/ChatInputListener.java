@@ -1,4 +1,4 @@
-package io.github.linsminecraftstudio.chat.input;
+package io.github.linsminecraftstudio.mxlib.chat.input;
 
 import java.util.HashMap;
 import java.util.HashSet;

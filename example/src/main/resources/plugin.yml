@@ -1,0 +1,5 @@
+name: MxLibExample
+version: 1.0.0
+main: "io.github.linsminecraftstudio.mxlibexample.ExamplePlugin"
+api-version: 1.19
+authors: [ lijinhong11 ]

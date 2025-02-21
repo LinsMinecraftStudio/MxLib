@@ -1,6 +1,6 @@
 package io.github.linsminecraftstudio.mxlib.inventory.menu.items;
 
-import io.github.linsminecraftstudio.mxlib.inventory.menu.MxMenuClickHandler;
+import io.github.linsminecraftstudio.mxlib.inventory.menu.handlers.MxMenuClickHandler;
 import lombok.AllArgsConstructor;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;

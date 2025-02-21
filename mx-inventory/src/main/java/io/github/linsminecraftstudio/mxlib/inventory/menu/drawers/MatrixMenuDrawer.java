@@ -1,7 +1,7 @@
 package io.github.linsminecraftstudio.mxlib.inventory.menu.drawers;
 
 import io.github.linsminecraftstudio.mxlib.inventory.menu.InvMenu;
-import io.github.linsminecraftstudio.mxlib.inventory.menu.MxMenuClickHandler;
+import io.github.linsminecraftstudio.mxlib.inventory.menu.handlers.MxMenuClickHandler;
 import io.github.linsminecraftstudio.mxlib.inventory.menu.items.SimpleMenuItem;
 import lombok.Getter;
 import org.bukkit.inventory.ItemStack;

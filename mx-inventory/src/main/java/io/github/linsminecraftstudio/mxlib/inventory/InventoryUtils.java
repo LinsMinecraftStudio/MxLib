@@ -1,6 +1,6 @@
 package io.github.linsminecraftstudio.mxlib.inventory;
 
-import io.github.linsminecraftstudio.chat.components.WrappedComponent;
+import io.github.linsminecraftstudio.mxlib.chat.components.WrappedComponent;
 import net.kyori.adventure.text.ComponentLike;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
