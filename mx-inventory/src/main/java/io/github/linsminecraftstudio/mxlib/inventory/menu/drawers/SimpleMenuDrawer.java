@@ -1,6 +1,8 @@
 package io.github.linsminecraftstudio.mxlib.inventory.menu.drawers;
 
-import io.github.linsminecraftstudio.mxlib.inventory.menu.InvMenu;
+import io.github.linsminecraftstudio.mxlib.inventory.items.MxCustomItemStack;
+import io.github.linsminecraftstudio.mxlib.inventory.menu.types.InvMenu;
+import io.github.linsminecraftstudio.mxlib.inventory.menu.handlers.MxMenuClickHandler;
 import io.github.linsminecraftstudio.mxlib.inventory.menu.items.MxMenuItem;
 import io.github.linsminecraftstudio.mxlib.inventory.menu.items.SimpleMenuItem;
 import org.bukkit.inventory.ItemStack;
@@ -28,6 +30,18 @@ public class SimpleMenuDrawer implements MenuDrawer {
         return setItem(slot, new SimpleMenuItem(null, itemStack));
     }
 
+    public SimpleMenuDrawer setItem(int slot, MxCustomItemStack itemStack) {
+        return setItem(slot, new SimpleMenuItem(null, itemStack.asBukkit()));
+    }
+
+    public SimpleMenuDrawer setItem(int slot, ItemStack itemStack, MxMenuClickHandler clickHandler) {
+        return setItem(slot, new SimpleMenuItem(clickHandler, itemStack));
+    }
+
+    public SimpleMenuDrawer setItem(int slot, MxCustomItemStack itemStack, MxMenuClickHandler clickHandler) {
+        return setItem(slot, new SimpleMenuItem(clickHandler, itemStack.asBukkit()));
+    }
+
     @Override
     public void draw(InvMenu menu) {
         for (int i = 0; i < menu.getSize(); i++) {
@@ -35,5 +49,10 @@ public class SimpleMenuDrawer implements MenuDrawer {
                 menu.setItem(i, items.get(i));
             }
         }
+    }
+
+    @Override
+    public SimpleMenuDrawer clone(){
+        return new SimpleMenuDrawer(new HashMap<>(items));
     }
 }

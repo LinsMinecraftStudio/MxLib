@@ -1,6 +1,6 @@
 package io.github.linsminecraftstudio.mxlib.inventory.menu.drawers;
 
-import io.github.linsminecraftstudio.mxlib.inventory.menu.InvMenu;
+import io.github.linsminecraftstudio.mxlib.inventory.menu.types.InvMenu;
 import io.github.linsminecraftstudio.mxlib.inventory.menu.handlers.MxMenuClickHandler;
 import io.github.linsminecraftstudio.mxlib.inventory.menu.items.SimpleMenuItem;
 import lombok.Getter;
@@ -48,7 +48,7 @@ import java.util.Map;
  */
 @SuppressWarnings("unused")
 @Getter
-public final class MatrixMenuDrawer implements Cloneable, MenuDrawer {
+public final class MatrixMenuDrawer implements MenuDrawer {
     private final int size;
     private final Map<Character, ItemStack> charMap = new HashMap<>();
     private final Map<Character, MxMenuClickHandler> clickHandlerMap = new HashMap<>();

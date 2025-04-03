@@ -12,10 +12,12 @@
     <description>A library for Minecraft plugins</description>
 
     <modules>
-        <module>packaging-jar</module>
         <module>mx-inventory</module>
         <module>mx-chat</module>
+        <module>mx-i18n</module>
+
         <module>example</module>
+        <module>packaging-jar</module>
     </modules>
 
     <url>https://github.com/LinsMinecraftStudio/MxLib</url>

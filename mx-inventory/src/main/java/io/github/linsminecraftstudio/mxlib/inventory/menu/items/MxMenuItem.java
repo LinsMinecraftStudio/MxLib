@@ -4,7 +4,7 @@ import io.github.linsminecraftstudio.mxlib.inventory.items.MxCustomItemStack;
 import io.github.linsminecraftstudio.mxlib.inventory.menu.handlers.MxMenuClickHandler;
 import org.bukkit.inventory.ItemStack;
 
-public interface MxMenuItem {
+public interface MxMenuItem extends Cloneable {
     MxMenuClickHandler getClickHandler();
 
     void setClickHandler(MxMenuClickHandler clickHandler);

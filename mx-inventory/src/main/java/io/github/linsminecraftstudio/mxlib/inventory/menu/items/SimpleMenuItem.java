@@ -31,4 +31,9 @@ public class SimpleMenuItem implements MxMenuItem {
     public void setItemStack(ItemStack itemStack) {
         this.itemStack = itemStack;
     }
+
+    @Override
+    public SimpleMenuItem clone() {
+        return new SimpleMenuItem(onClick, itemStack.clone());
+    }
 }

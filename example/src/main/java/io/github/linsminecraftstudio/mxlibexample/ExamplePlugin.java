@@ -2,7 +2,7 @@ package io.github.linsminecraftstudio.mxlibexample;
 
 import io.github.linsminecraftstudio.mxlib.chat.components.WrappedComponent;
 import io.github.linsminecraftstudio.mxlib.inventory.items.MxCustomItemStack;
-import io.github.linsminecraftstudio.mxlib.inventory.menu.InvMenu;
+import io.github.linsminecraftstudio.mxlib.inventory.menu.types.InvMenu;
 import io.github.linsminecraftstudio.mxlib.inventory.menu.drawers.MatrixMenuDrawer;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;

@@ -1,7 +1,8 @@
-package io.github.linsminecraftstudio.mxlib.inventory.menu;
+package io.github.linsminecraftstudio.mxlib.inventory.menu.types;
 
 import io.github.linsminecraftstudio.mxlib.chat.components.WrappedComponent;
 import io.github.linsminecraftstudio.mxlib.inventory.InventoryUtils;
+import io.github.linsminecraftstudio.mxlib.inventory.menu.MxInventoryHolder;
 import io.github.linsminecraftstudio.mxlib.inventory.menu.drawers.MenuDrawer;
 import io.github.linsminecraftstudio.mxlib.inventory.menu.handlers.MxMenuCloseHandler;
 import io.github.linsminecraftstudio.mxlib.inventory.menu.handlers.MxMenuDragHandler;
@@ -15,10 +16,13 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Builder
 public class InvMenu extends MxInventoryHolder {
@@ -42,7 +46,7 @@ public class InvMenu extends MxInventoryHolder {
     @Builder.Default private MenuDrawer drawer = MenuDrawer.EMPTY;
 
     /* Internal fields */
-    private final Map<Integer, MxMenuItem> items = new HashMap<>();
+    private final Map<Integer, MxMenuItem> items = new ConcurrentHashMap<>();
 
     InvMenu(Inventory baseInventory, WrappedComponent title, MxMenuOpenHandler openHandler, MxMenuCloseHandler closeHandler, MxMenuDragHandler dragHandler, int rows, boolean copyBaseInventory, MenuDrawer drawer) {
         this.baseInventory = baseInventory;
@@ -97,6 +101,8 @@ public class InvMenu extends MxInventoryHolder {
      */
     @Override
     public void setItem(int slot, @Nullable MxMenuItem item) {
+
+
         items.put(slot, item);
 
         if (baseInventory == null) {
@@ -190,5 +196,11 @@ public class InvMenu extends MxInventoryHolder {
                 .filter(Player.class::isInstance)
                 .map(Player.class::cast)
                 .toList();
+    }
+
+    public void closeAll() {
+        for (Player player : getViewers()) {
+            player.closeInventory();
+        }
     }
 }

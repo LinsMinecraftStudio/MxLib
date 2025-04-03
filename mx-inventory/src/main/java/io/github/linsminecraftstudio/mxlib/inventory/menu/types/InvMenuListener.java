@@ -1,4 +1,4 @@
-package io.github.linsminecraftstudio.mxlib.inventory.menu;
+package io.github.linsminecraftstudio.mxlib.inventory.menu.types;
 
 import io.github.linsminecraftstudio.mxlib.inventory.menu.items.MxMenuItem;
 import org.bukkit.entity.Player;
