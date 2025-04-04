@@ -127,11 +127,18 @@ public final class MatrixMenuDrawer implements MenuDrawer {
 
     @Override
     public void draw(InvMenu menu) {
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                char c = matrix.get(i / 9).charAt(j / 3);
+        for (int i = 0; i < matrix.size(); i++) {
+            String line = matrix.get(i);
+            for (int j = 0; j < line.length(); j++) {
+                int slot = i * 9 + j;
+                if (slot >= size) {
+                    continue;
+                }
+
+                char c = line.charAt(j);
                 if (charMap.containsKey(c)) {
-                    menu.setItem(i * size + j, new SimpleMenuItem(clickHandlerMap.get(c), charMap.get(c)));
+                    MxMenuClickHandler handler = clickHandlerMap.getOrDefault(c, null);
+                    menu.setItem(slot, new SimpleMenuItem(handler, charMap.get(c)));
                 }
             }
         }

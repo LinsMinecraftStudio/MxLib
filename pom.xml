@@ -6,7 +6,7 @@
 
     <groupId>io.github.linsminecraftstudio.mxlib</groupId>
     <artifactId>MxLib</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <packaging>pom</packaging>
 
     <description>A library for Minecraft plugins</description>
@@ -91,7 +91,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <revision>1.0.2</revision>
+        <revision>1.0.3</revision>
     </properties>
 
     <repositories>

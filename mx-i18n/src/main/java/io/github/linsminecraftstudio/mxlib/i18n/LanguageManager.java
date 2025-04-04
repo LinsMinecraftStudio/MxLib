@@ -6,7 +6,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.InputStream;
@@ -77,6 +76,11 @@ public class LanguageManager {
         }
     }
 
+    /**
+     * Synchronizes the language file with the default language file.
+     * @param plugin the plugin instance.
+     * @param resourceFile the path of the language file.
+     */
     public static void completeLangFile(Plugin plugin, String resourceFile) {
         InputStream stream = plugin.getResource(resourceFile);
         File file = new File(plugin.getDataFolder(), resourceFile);
@@ -129,22 +133,74 @@ public class LanguageManager {
         }
     }
 
-
+    /**
+     * Get the message with the specified key and arguments in the player's language.
+     * @param player The player to get the language from.
+     * @param key The key of the message.
+     * @param args The arguments of the message (You should use {0}, {1}, etc. to specify the arguments in the raw message, see {@link java.text.MessageFormat}).
+     * @return The message with the specified key and arguments in the player's language.
+     */
     public WrappedComponent getMsg(Player player, String key, Object... args) {
         return getMsg(getPlayerLocale(player), key, args);
     }
 
+    /**
+     * Get the message with the specified key and arguments in the player's language.
+     * @param language The language to get the message from.
+     * @param key The key of the message.
+     * @param args The arguments of the message (You should use {0}, {1}, etc. to specify the arguments in the raw message, see {@link java.text.MessageFormat}).
+     * @return The message with the specified key and arguments in the player's language.
+     */
     public WrappedComponent getMsg(Language language, String key, Object... args) {
         LanguageData languageData = getLanguageData(language);
         return languageData.getMsg(key, args);
     }
 
-    public void sendMsg(CommandSender sender, String key, Object... args) {
-        sender.sendMessage(getMsg(getPlayerLocale(null), key, args).asComponent());
+    /**
+     * Get the raw message with the specified key in the player's language.
+     * @param player The player to get the language from.
+     * @param key The key of the message.
+     * @return The raw message with the specified key in the player's language.
+     */
+    public String getRawMsg(Player player, String key) {
+        return getRawMsg(getPlayerLocale(player), key);
     }
 
+    /**
+     * Get the raw message with the specified key in the player's language.
+     * @param language The language to get the message from.
+     * @param key The key of the message.
+     * @return The raw message with the specified key in the player's language.
+     */
+    public String getRawMsg(Language language, String key) {
+        LanguageData languageData = getLanguageData(language);
+        return languageData.getRawMsg(key);
+    }
+
+    /**
+     * Send the message with the specified key and arguments to the sender.
+     * @param sender The sender to send the message to.
+     * @param key The key of the message.
+     * @param args The arguments of the message
+     *             (You should use {0}, {1}, ...
+     *             to specify the arguments in the raw message, see {@link java.text.MessageFormat}).
+     * @see java.text.MessageFormat
+     */
+    public void sendMsg(CommandSender sender, String key, Object... args) {
+        sender.sendMessage(getMsg(getPlayerLocale(null), key, args));
+    }
+
+    /**
+     * Send the message with the specified key and arguments to the player's action bar.
+     * @param player The player to send the message to.
+     * @param key The key of the message.
+     * @param args The arguments of the message
+     *             (You should use {0},{1}, ...
+     *             to specify the arguments in the raw message, see {@link java.text.MessageFormat}).
+     * @see java.text.MessageFormat
+     */
     public void sendActionBar(Player player, String key, Object... args) {
-        player.sendActionBar(getMsg(player, key, args).asComponent());
+        player.sendActionBar(getMsg(player, key, args));
     }
 
     public void reload() {

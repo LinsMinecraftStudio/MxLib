@@ -18,6 +18,10 @@ class LanguageData {
         return WrappedComponent.of(getMessageFormat(key).format(args));
     }
 
+    public String getRawMsg(String key) {
+        return section.getString(key, "Missing translation for key: " + key);
+    }
+
     private MessageFormat getMessageFormat(String key) {
         String pattern = section.getString(key, "Missing translation for key: " + key);
         return new MessageFormat(pattern);
