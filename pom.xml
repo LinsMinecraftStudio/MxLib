@@ -6,7 +6,7 @@
 
     <groupId>io.github.linsminecraftstudio.mxlib</groupId>
     <artifactId>MxLib</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <packaging>pom</packaging>
 
     <description>A library for Minecraft plugins</description>
@@ -15,6 +15,7 @@
         <module>mx-inventory</module>
         <module>mx-chat</module>
         <module>mx-i18n</module>
+        <module>mx-database</module>
 
         <module>example</module>
         <module>packaging-jar</module>
@@ -91,7 +92,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <revision>1.0.3</revision>
+        <revision>1.0.4</revision>
     </properties>
 
     <repositories>

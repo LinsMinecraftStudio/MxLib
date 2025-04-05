@@ -9,8 +9,8 @@
         <version>1.0.4</version>
     </parent>
 
-    <artifactId>mx-inventory</artifactId>
-    <description>A inventory library in Minecraft plugins.</description>
+    <artifactId>mx-database</artifactId>
+    <description>A chat library for Minecraft plugins.</description>
 
     <url>https://github.com/LinsMinecraftStudio/MxLib</url>
 
@@ -50,15 +50,6 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.11.2</version>
                 <executions>
@@ -70,7 +61,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <doclint>none</doclint>
+                    <doclint>all</doclint>
                     <show>public</show>
                     <nohelp>true</nohelp>
                     <encoding>UTF-8</encoding>
@@ -117,8 +108,44 @@
                     <publishingServerId>central</publishingServerId>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <artifactSet>
+                        <excludes>
+                            <exclude>org.slf4j</exclude>
+                        </excludes>
+                    </artifactSet>
+                    <relocations>
+                        <relocation>
+                            <pattern>com.zaxxer.hikari</pattern>
+                            <shadedPattern>io.github.linsminecraftstudio.mxlib.database.libs.hikari</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.mariadb.jdbc</pattern>
+                            <shadedPattern>io.github.linsminecraftstudio.mxlib.database.libs.mariadb</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -129,10 +156,19 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
+
+        <!-- Database Libraries -->
         <dependency>
-            <groupId>io.github.linsminecraftstudio.mxlib</groupId>
-            <artifactId>mx-chat</artifactId>
-            <version>1.0.4</version>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>6.2.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>3.5.3</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>
