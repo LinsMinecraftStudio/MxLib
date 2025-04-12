@@ -1,5 +1,6 @@
 package io.github.linsminecraftstudio.mxlib.database;
 
+import io.github.linsminecraftstudio.mxlib.database.enums.DatabaseType;
 import io.github.linsminecraftstudio.mxlib.database.sql.AbstractSqlBuilder;
 import io.github.linsminecraftstudio.mxlib.database.sql.sentence.SelectBuilder;
 
@@ -18,4 +19,6 @@ public interface DatabaseConnection {
     void commit() throws SQLException;
 
     void rollback() throws SQLException;
+
+    DatabaseType getType();
 }

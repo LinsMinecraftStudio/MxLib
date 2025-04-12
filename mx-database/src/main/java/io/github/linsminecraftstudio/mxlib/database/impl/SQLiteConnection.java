@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.github.linsminecraftstudio.mxlib.database.DatabaseConnection;
 import io.github.linsminecraftstudio.mxlib.database.DatabaseParameters;
+import io.github.linsminecraftstudio.mxlib.database.enums.DatabaseType;
 import io.github.linsminecraftstudio.mxlib.database.sql.AbstractSqlBuilder;
 import io.github.linsminecraftstudio.mxlib.database.sql.sentence.SelectBuilder;
 
@@ -60,6 +61,11 @@ class SQLiteConnection implements DatabaseConnection {
         try (Connection connection = dataSource.getConnection()) {
             connection.rollback();
         }
+    }
+
+    @Override
+    public DatabaseType getType() {
+        return DatabaseType.SQLITE;
     }
 
     @Override
