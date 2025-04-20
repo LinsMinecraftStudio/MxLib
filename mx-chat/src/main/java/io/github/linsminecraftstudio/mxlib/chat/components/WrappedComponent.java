@@ -3,9 +3,11 @@ package io.github.linsminecraftstudio.mxlib.chat.components;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.title.Title;
@@ -17,23 +19,32 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Duration;
 
 /**
- * A wrapper for a Component that provides additional methods for sending and modifying the component.
+ * A wrapper for a Component provides more methods for sending and modifying the component.
  */
 @Getter
-public class WrappedComponent implements ComponentLike {
+public class WrappedComponent implements ComponentLike, Cloneable {
     private static final LegacyComponentSerializer SECTION = LegacyComponentSerializer.legacySection();
     private static final LegacyComponentSerializer AMPERSAND = LegacyComponentSerializer.legacyAmpersand();
 
     private static final WrappedComponent EMPTY = new WrappedComponent(Component.empty());
+    private static final WrappedComponent RESET = new WrappedComponent(Component.empty().decoration(TextDecoration.ITALIC, false));
 
     private Component component;
 
     private WrappedComponent(Component component) {
-        this.component = component;
+        this.component = reset().append(component).getComponent();
+    }
+
+    private WrappedComponent(WrappedComponent component){
+        this(component.component);
     }
 
     public static WrappedComponent empty() {
         return EMPTY.clone();
+    }
+
+    public static WrappedComponent reset() {
+        return RESET.clone();
     }
 
     /**
@@ -114,8 +125,8 @@ public class WrappedComponent implements ComponentLike {
     }
 
     /**
-     * Sends the component to a player as an action bar message.
-     * @param player the player to send the action bar to
+     * Sends the component to a player as an action-bar message.
+     * @param player the player to send the action-bar to
      */
     public void sendAsActionBar(Player player) {
         player.sendActionBar(component);
@@ -167,7 +178,11 @@ public class WrappedComponent implements ComponentLike {
      */
     public WrappedComponent replace(String oldText, ComponentLike newComponent) {
         component = component.replaceText(b -> b.matchLiteral(oldText).replacement(newComponent));
+        return this;
+    }
 
+    public WrappedComponent join(JoinConfiguration join, ComponentLike... components) {
+        component = Component.join(join, components);
         return this;
     }
 
@@ -177,7 +192,6 @@ public class WrappedComponent implements ComponentLike {
      */
     public WrappedComponent append(String text) {
         component = component.append(Component.text(text));
-
         return this;
     }
 
@@ -187,7 +201,6 @@ public class WrappedComponent implements ComponentLike {
      */
     public WrappedComponent append(ComponentLike component) {
         this.component = this.component.append(component.asComponent());
-
         return this;
     }
 
@@ -223,7 +236,6 @@ public class WrappedComponent implements ComponentLike {
      */
     public WrappedComponent appendMiniMessage(String text) {
         component = component.append(MiniMessage.miniMessage().deserialize(text));
-
         return this;
     }
 
@@ -234,7 +246,6 @@ public class WrappedComponent implements ComponentLike {
      */
     public WrappedComponent color(NamedTextColor color) {
         component = component.color(color);
-
         return this;
     }
 
@@ -245,7 +256,6 @@ public class WrappedComponent implements ComponentLike {
      */
     public WrappedComponent color(int color) {
         component = component.color(TextColor.color(color));
-
         return this;
     }
 
@@ -256,7 +266,6 @@ public class WrappedComponent implements ComponentLike {
      */
     public WrappedComponent color(RGBLike color) {
         component = component.color(TextColor.color(color));
-
         return this;
     }
 
@@ -267,7 +276,6 @@ public class WrappedComponent implements ComponentLike {
      */
     public WrappedComponent style(Style style) {
         component = component.style(style);
-
         return this;
     }
 
