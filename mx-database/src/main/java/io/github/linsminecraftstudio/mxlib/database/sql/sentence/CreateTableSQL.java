@@ -7,12 +7,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class CreateTableSQL extends SQL {
-    private String tableName;
     private final Map<String, ColumnDefinition> columns = new LinkedHashMap<>();
     private final List<String> primaryKeys = new ArrayList<>();
     private final List<ForeignKey> foreignKeys = new ArrayList<>();
     private final List<String> uniqueConstraints = new ArrayList<>();
     private final List<String> checks = new ArrayList<>();
+
+    private String tableName;
+    private boolean ifNotExists;
     private String tableOptions;
 
     CreateTableSQL() {}
@@ -20,6 +22,11 @@ public class CreateTableSQL extends SQL {
     public CreateTableSQL table(String tableName) {
         validateIdentifier(tableName);
         this.tableName = tableName;
+        return this;
+    }
+
+    public CreateTableSQL ifNotExists() {
+        this.ifNotExists = true;
         return this;
     }
 
@@ -97,7 +104,13 @@ public class CreateTableSQL extends SQL {
         }
 
         StringBuilder sql = new StringBuilder("CREATE TABLE ");
-        sql.append(tableName).append(" (\n");
+        sql.append(tableName);
+
+        if (ifNotExists) {
+            sql.append(" IF NOT EXISTS");
+        }
+
+        sql.append(" (\n");
 
         // Column definitions
         List<String> columnDefs = columns.entrySet().stream()

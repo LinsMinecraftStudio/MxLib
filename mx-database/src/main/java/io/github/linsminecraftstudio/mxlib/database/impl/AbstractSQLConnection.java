@@ -114,7 +114,7 @@ abstract class AbstractSQLConnection implements DatabaseConnection {
 
         List<Field> field = ObjectSerializer.getAllFields(clazz);
 
-        CreateTableSQL sql = SQL.createTable().table(table.name());
+        CreateTableSQL sql = SQL.createTable().table(table.name()).ifNotExists();
 
         for (Field f : field) {
             if (f.isAnnotationPresent(Column.class)) {

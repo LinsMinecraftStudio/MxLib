@@ -31,6 +31,10 @@ public abstract class SQL {
         return new DeleteSQL();
     }
 
+    public static DropSQL drop() {
+        return new DropSQL();
+    }
+
     public static CreateTableSQL createTable() {
         return new CreateTableSQL();
     }

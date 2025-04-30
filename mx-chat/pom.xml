@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.github.linsminecraftstudio.mxlib</groupId>
         <artifactId>MxLib</artifactId>
-        <version>1.0.7</version>
+        <version>1.0.7.1</version>
     </parent>
 
     <artifactId>mx-chat</artifactId>
