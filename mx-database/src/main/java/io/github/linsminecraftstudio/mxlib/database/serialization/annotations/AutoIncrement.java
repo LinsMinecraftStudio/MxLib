@@ -1,4 +1,4 @@
-package io.github.linsminecraftstudio.mxlib.database.serialization;
+package io.github.linsminecraftstudio.mxlib.database.serialization.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,6 +7,5 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface Column {
-    String name();
+public @interface AutoIncrement {
 }

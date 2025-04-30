@@ -1,4 +1,4 @@
-package io.github.linsminecraftstudio.mxlib.database.sql;
+package io.github.linsminecraftstudio.mxlib.database.sql.sentence;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,21 +7,42 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class AbstractSqlBuilder implements SqlBuilder {
+public abstract class SQL {
     protected final StringBuilder sqlBuilder = new StringBuilder();
     protected final List<Object> parameters = new ArrayList<>();
 
-    @Override
-    public String getSql() {
+    public static SelectSQL select() {
+        return new SelectSQL();
+    }
+
+    public static InsertSQL insert() {
+        return new InsertSQL(false);
+    }
+
+    public static InsertSQL upsert() {
+        return new InsertSQL(true);
+    }
+
+    public static UpdateSQL update() {
+        return new UpdateSQL();
+    }
+
+    public static DeleteSQL delete() {
+        return new DeleteSQL();
+    }
+
+    public static CreateTableSQL createTable() {
+        return new CreateTableSQL();
+    }
+
+    String getSql() {
         return sqlBuilder.toString();
     }
 
-    @Override
-    public List<Object> getParameters() {
+    List<Object> getParameters() {
         return Collections.unmodifiableList(parameters);
     }
 
-    @Override
     public PreparedStatement build(Connection connection) throws SQLException {
         PreparedStatement stmt = connection.prepareStatement(getSql());
         for (int i = 0; i < parameters.size(); i++) {
@@ -30,11 +51,7 @@ public abstract class AbstractSqlBuilder implements SqlBuilder {
         return stmt;
     }
 
-    protected void addParameter(Object value) {
-        parameters.add(value);
-    }
-
-    protected void validateIdentifier(String identifier) {
+    void validateIdentifier(String identifier) {
         if (!identifier.matches("[a-zA-Z_][a-zA-Z0-9_]*")) {
             throw new IllegalArgumentException("Invalid SQL identifier: " + identifier);
         }

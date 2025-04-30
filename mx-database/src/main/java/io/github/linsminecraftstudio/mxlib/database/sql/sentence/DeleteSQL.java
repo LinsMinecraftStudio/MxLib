@@ -1,25 +1,26 @@
 package io.github.linsminecraftstudio.mxlib.database.sql.sentence;
 
-import io.github.linsminecraftstudio.mxlib.database.sql.AbstractSqlBuilder;
 import io.github.linsminecraftstudio.mxlib.database.sql.conditions.Condition;
 
-public class DeleteBuilder extends AbstractSqlBuilder {
+public class DeleteSQL extends SQL {
     private String table;
     private Condition whereCondition;
 
-    public DeleteBuilder from(String table) {
+    DeleteSQL() {}
+
+    public DeleteSQL from(String table) {
         validateIdentifier(table);
         this.table = table;
         return this;
     }
 
-    public DeleteBuilder where(Condition condition) {
+    public DeleteSQL where(Condition condition) {
         this.whereCondition = condition;
         return this;
     }
 
     @Override
-    public String getSql() {
+    String getSql() {
         sqlBuilder.setLength(0);
         sqlBuilder.append("DELETE FROM ").append(table);
 

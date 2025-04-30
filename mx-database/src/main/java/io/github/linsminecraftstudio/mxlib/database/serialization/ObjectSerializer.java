@@ -1,5 +1,6 @@
 package io.github.linsminecraftstudio.mxlib.database.serialization;
 
+import io.github.linsminecraftstudio.mxlib.database.serialization.annotations.Column;
 import org.apache.commons.lang3.SerializationException;
 
 import java.lang.reflect.Field;
@@ -132,7 +133,7 @@ public class ObjectSerializer {
         throw new UnsupportedOperationException("Unsupported type: " + type.getName());
     }
 
-    private static List<Field> getAllFields(Class<?> clazz) {
+    public static List<Field> getAllFields(Class<?> clazz) {
         List<Field> fields = new ArrayList<>();
         for (Field field : clazz.getDeclaredFields()) {
             if (Modifier.isFinal(field.getModifiers())) {
@@ -144,5 +145,35 @@ public class ObjectSerializer {
         }
 
         return fields;
+    }
+
+    public static String getSqlType(Class<?> javaType) {
+        if (javaType == String.class)
+            return "TEXT";
+        if (javaType == int.class || javaType == Integer.class)
+            return "INT";
+        if (javaType == long.class || javaType == Long.class)
+            return "BIGINT";
+        if (javaType == boolean.class || javaType == Boolean.class)
+            return "BOOLEAN";
+        if (javaType == double.class || javaType == Double.class)
+            return "DOUBLE";
+        if (javaType == float.class || javaType == Float.class)
+            return "FLOAT";
+        if (javaType == Date.class || javaType == Timestamp.class)
+            return "DATETIME";
+        if (javaType == BigDecimal.class)
+            return "DECIMAL(18,6)";
+        if (javaType.isEnum())
+            return "VARCHAR(50)";
+        if (javaType.isArray())
+            return "BLOB";
+
+        ObjectConverter<?> converter = ObjectSerializer.CONVERTERS.get(javaType);
+        if (converter != null) {
+            return converter.getSqlType();
+        }
+
+        throw new IllegalArgumentException("Unsupported type: " + javaType.getName());
     }
 }

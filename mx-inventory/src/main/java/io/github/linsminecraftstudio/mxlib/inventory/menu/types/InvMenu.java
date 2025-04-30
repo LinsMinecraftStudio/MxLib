@@ -4,6 +4,7 @@ import io.github.linsminecraftstudio.mxlib.chat.components.WrappedComponent;
 import io.github.linsminecraftstudio.mxlib.inventory.InventoryUtils;
 import io.github.linsminecraftstudio.mxlib.inventory.menu.MxInventoryHolder;
 import io.github.linsminecraftstudio.mxlib.inventory.menu.drawers.MenuDrawer;
+import io.github.linsminecraftstudio.mxlib.inventory.menu.filler.MenuFiller;
 import io.github.linsminecraftstudio.mxlib.inventory.menu.handlers.MxMenuCloseHandler;
 import io.github.linsminecraftstudio.mxlib.inventory.menu.handlers.MxMenuDragHandler;
 import io.github.linsminecraftstudio.mxlib.inventory.menu.handlers.MxMenuOpenHandler;
@@ -101,8 +102,6 @@ public class InvMenu extends MxInventoryHolder {
      */
     @Override
     public void setItem(int slot, @Nullable MxMenuItem item) {
-
-
         items.put(slot, item);
 
         if (baseInventory == null) {
@@ -114,6 +113,10 @@ public class InvMenu extends MxInventoryHolder {
         for (Player player : getViewers()) {
             player.updateInventory();
         }
+    }
+
+    public MenuFiller getFiller() {
+        return new MenuFiller(this);
     }
 
     private void initInventory() {

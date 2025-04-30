@@ -1,7 +1,6 @@
 package io.github.linsminecraftstudio.mxlib.database.sql.sentence;
 
 import io.github.linsminecraftstudio.mxlib.database.enums.JoinType;
-import io.github.linsminecraftstudio.mxlib.database.sql.AbstractSqlBuilder;
 import io.github.linsminecraftstudio.mxlib.database.sql.conditions.Condition;
 
 import java.sql.Connection;
@@ -12,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SelectBuilder extends AbstractSqlBuilder {
+public class SelectSQL extends SQL {
     private boolean distinct = false;
     private final List<String> columns = new ArrayList<>();
     private String table;
@@ -26,76 +25,78 @@ public class SelectBuilder extends AbstractSqlBuilder {
     private boolean forUpdate = false;
     private final List<Object> parameters = new ArrayList<>();
 
-    public SelectBuilder distinct() {
+    SelectSQL() {}
+
+    public SelectSQL distinct() {
         this.distinct = true;
         return this;
     }
 
-    public SelectBuilder from(String table) {
+    public SelectSQL from(String table) {
         validateIdentifier(table);
         this.table = table;
         return this;
     }
 
-    public SelectBuilder column(String column) {
+    public SelectSQL column(String column) {
         validateIdentifier(column);
         this.columns.add(column);
         return this;
     }
 
-    public SelectBuilder column(String column, String alias) {
+    public SelectSQL column(String column, String alias) {
         validateIdentifier(column);
         if (alias != null) validateIdentifier(alias);
         this.columns.add(column + (alias != null ? " AS " + alias : ""));
         return this;
     }
 
-    public SelectBuilder columns(String... columns) {
+    public SelectSQL columns(String... columns) {
         for (String column : columns) {
             column(column);
         }
         return this;
     }
 
-    public SelectBuilder allColumns() {
+    public SelectSQL allColumns() {
         this.columns.add("*");
         return this;
     }
 
-    public SelectBuilder join(String table, String onClause) {
+    public SelectSQL join(String table, String onClause) {
         return join(table, onClause, io.github.linsminecraftstudio.mxlib.database.enums.JoinType.INNER);
     }
 
-    public SelectBuilder join(String table, String onClause, JoinType joinType) {
+    public SelectSQL join(String table, String onClause, JoinType joinType) {
         validateIdentifier(table);
         this.joins.add(new JoinClause(table, onClause, joinType));
         return this;
     }
 
-    public SelectBuilder leftJoin(String table, String onClause) {
+    public SelectSQL leftJoin(String table, String onClause) {
         return join(table, onClause, io.github.linsminecraftstudio.mxlib.database.enums.JoinType.LEFT);
     }
 
-    public SelectBuilder rightJoin(String table, String onClause) {
+    public SelectSQL rightJoin(String table, String onClause) {
         return join(table, onClause, io.github.linsminecraftstudio.mxlib.database.enums.JoinType.RIGHT);
     }
 
-    public SelectBuilder fullJoin(String table, String onClause) {
+    public SelectSQL fullJoin(String table, String onClause) {
         return join(table, onClause, io.github.linsminecraftstudio.mxlib.database.enums.JoinType.FULL);
     }
 
-    public SelectBuilder where(Condition condition) {
+    public SelectSQL where(Condition condition) {
         this.whereCondition = condition;
         return this;
     }
 
-    public SelectBuilder groupBy(String column) {
+    public SelectSQL groupBy(String column) {
         validateIdentifier(column);
         this.groupByList.add(new GroupBy(column));
         return this;
     }
 
-    public SelectBuilder groupBy(String column, String... additionalColumns) {
+    public SelectSQL groupBy(String column, String... additionalColumns) {
         groupBy(column);
         for (String col : additionalColumns) {
             groupBy(col);
@@ -103,38 +104,38 @@ public class SelectBuilder extends AbstractSqlBuilder {
         return this;
     }
 
-    public SelectBuilder having(Condition condition) {
+    public SelectSQL having(Condition condition) {
         this.havingCondition = condition;
         return this;
     }
 
-    public SelectBuilder orderBy(String column) {
+    public SelectSQL orderBy(String column) {
         return orderBy(column, OrderType.ASC);
     }
 
-    public SelectBuilder orderBy(String column, OrderType orderType) {
+    public SelectSQL orderBy(String column, OrderType orderType) {
         validateIdentifier(column);
         this.orderByList.add(new OrderBy(column, orderType));
         return this;
     }
 
-    public SelectBuilder limit(int limit) {
+    public SelectSQL limit(int limit) {
         this.limit = limit;
         return this;
     }
 
-    public SelectBuilder offset(int offset) {
+    public SelectSQL offset(int offset) {
         this.offset = offset;
         return this;
     }
 
-    public SelectBuilder forUpdate() {
+    public SelectSQL forUpdate() {
         this.forUpdate = true;
         return this;
     }
 
     @Override
-    public String getSql() {
+    String getSql() {
         if (table == null) {
             throw new IllegalStateException("Table must be specified");
         }

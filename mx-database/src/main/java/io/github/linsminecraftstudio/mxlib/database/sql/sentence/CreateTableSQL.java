@@ -1,14 +1,12 @@
 package io.github.linsminecraftstudio.mxlib.database.sql.sentence;
 
-import io.github.linsminecraftstudio.mxlib.database.sql.AbstractSqlBuilder;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class CreateTableBuilder extends AbstractSqlBuilder {
+public class CreateTableSQL extends SQL {
     private String tableName;
     private final Map<String, ColumnDefinition> columns = new LinkedHashMap<>();
     private final List<String> primaryKeys = new ArrayList<>();
@@ -17,43 +15,45 @@ public class CreateTableBuilder extends AbstractSqlBuilder {
     private final List<String> checks = new ArrayList<>();
     private String tableOptions;
 
-    public CreateTableBuilder table(String tableName) {
+    CreateTableSQL() {}
+
+    public CreateTableSQL table(String tableName) {
         validateIdentifier(tableName);
         this.tableName = tableName;
         return this;
     }
 
-    public CreateTableBuilder column(String name, String dataType) {
+    public CreateTableSQL column(String name, String dataType) {
         return column(name, dataType, null);
     }
 
-    public CreateTableBuilder column(String name, String dataType, Integer length) {
+    public CreateTableSQL column(String name, String dataType, Integer length) {
         validateIdentifier(name);
         columns.put(name, new ColumnDefinition(dataType, length, false, true, null, null));
         return this;
     }
 
-    public CreateTableBuilder notNull(String columnName) {
+    public CreateTableSQL notNull(String columnName) {
         getColumn(columnName).nullable = false;
         return this;
     }
 
-    public CreateTableBuilder nullable(String columnName) {
+    public CreateTableSQL nullable(String columnName) {
         getColumn(columnName).nullable = true;
         return this;
     }
 
-    public CreateTableBuilder defaultValue(String columnName, String defaultValue) {
+    public CreateTableSQL defaultValue(String columnName, String defaultValue) {
         getColumn(columnName).defaultValue = defaultValue;
         return this;
     }
 
-    public CreateTableBuilder autoIncrement(String columnName) {
+    public CreateTableSQL autoIncrement(String columnName) {
         getColumn(columnName).autoIncrement = true;
         return this;
     }
 
-    public CreateTableBuilder primaryKey(String... columnNames) {
+    public CreateTableSQL primaryKey(String... columnNames) {
         for (String columnName : columnNames) {
             validateIdentifier(columnName);
             primaryKeys.add(columnName);
@@ -61,7 +61,7 @@ public class CreateTableBuilder extends AbstractSqlBuilder {
         return this;
     }
 
-    public CreateTableBuilder foreignKey(String column, String referenceTable, String referenceColumn) {
+    public CreateTableSQL foreignKey(String column, String referenceTable, String referenceColumn) {
         validateIdentifier(column);
         validateIdentifier(referenceTable);
         validateIdentifier(referenceColumn);
@@ -69,7 +69,7 @@ public class CreateTableBuilder extends AbstractSqlBuilder {
         return this;
     }
 
-    public CreateTableBuilder unique(String... columnNames) {
+    public CreateTableSQL unique(String... columnNames) {
         for (String columnName : columnNames) {
             validateIdentifier(columnName);
             uniqueConstraints.add(columnName);
@@ -77,18 +77,18 @@ public class CreateTableBuilder extends AbstractSqlBuilder {
         return this;
     }
 
-    public CreateTableBuilder check(String condition) {
+    public CreateTableSQL check(String condition) {
         checks.add(condition);
         return this;
     }
 
-    public CreateTableBuilder options(String options) {
+    public CreateTableSQL options(String options) {
         this.tableOptions = options;
         return this;
     }
 
     @Override
-    public String getSql() {
+    String getSql() {
         if (tableName == null) {
             throw new IllegalStateException("Table name must be specified");
         }
@@ -210,15 +210,6 @@ public class CreateTableBuilder extends AbstractSqlBuilder {
         }
     }
 
-    private static class ForeignKey {
-        final String column;
-        final String referenceTable;
-        final String referenceColumn;
-
-        ForeignKey(String column, String referenceTable, String referenceColumn) {
-            this.column = column;
-            this.referenceTable = referenceTable;
-            this.referenceColumn = referenceColumn;
-        }
+    private record ForeignKey(String column, String referenceTable, String referenceColumn) {
     }
 }

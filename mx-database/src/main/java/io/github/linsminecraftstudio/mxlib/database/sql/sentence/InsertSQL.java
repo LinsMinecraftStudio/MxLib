@@ -1,29 +1,33 @@
 package io.github.linsminecraftstudio.mxlib.database.sql.sentence;
 
-import io.github.linsminecraftstudio.mxlib.database.sql.AbstractSqlBuilder;
-
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class InsertBuilder extends AbstractSqlBuilder {
+public class InsertSQL extends SQL {
     private final Map<String, Object> values = new LinkedHashMap<>();
+    private final boolean upsert;
+
     private String table;
 
-    public InsertBuilder into(String table) {
+    InsertSQL(boolean upsert) {
+        this.upsert = upsert;
+    }
+
+    public InsertSQL into(String table) {
         validateIdentifier(table);
         this.table = table;
         return this;
     }
 
-    public InsertBuilder value(String column, Object value) {
+    public InsertSQL value(String column, Object value) {
         validateIdentifier(column);
         values.put(column, value);
         return this;
     }
 
     @Override
-    public String getSql() {
+    String getSql() {
         sqlBuilder.setLength(0);
         sqlBuilder.append("INSERT INTO ").append(table);
 
@@ -33,8 +37,11 @@ public class InsertBuilder extends AbstractSqlBuilder {
                     .append(") VALUES (")
                     .append(String.join(", ", Collections.nCopies(values.size(), "?")))
                     .append(")");
-
             parameters.addAll(values.values());
+        }
+
+        if (upsert) {
+            sqlBuilder.append(" ON DUPLICATE KEY UPDATE");
         }
 
         return sqlBuilder.toString();

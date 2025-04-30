@@ -1,6 +1,5 @@
 package io.github.linsminecraftstudio.mxlib.database.sql.sentence;
 
-import io.github.linsminecraftstudio.mxlib.database.sql.AbstractSqlBuilder;
 import io.github.linsminecraftstudio.mxlib.database.sql.conditions.Condition;
 
 import java.util.ArrayList;
@@ -8,24 +7,27 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UpdateBuilder extends AbstractSqlBuilder {
+public class UpdateSQL extends SQL {
+    private final Map<String, Object> updates = new LinkedHashMap<>();
+
     private String table;
-    private Map<String, Object> updates = new LinkedHashMap<>();
     private Condition whereCondition;
 
-    public UpdateBuilder table(String table) {
+    UpdateSQL() {}
+
+    public UpdateSQL table(String table) {
         validateIdentifier(table);
         this.table = table;
         return this;
     }
 
-    public UpdateBuilder set(String column, Object value) {
+    public UpdateSQL set(String column, Object value) {
         validateIdentifier(column);
         updates.put(column, value);
         return this;
     }
 
-    public UpdateBuilder where(Condition condition) {
+    public UpdateSQL where(Condition condition) {
         this.whereCondition = condition;
         return this;
     }
