@@ -1,5 +1,6 @@
 package io.github.linsminecraftstudio.mxlib.database.sql.sentence;
 
+import io.github.linsminecraftstudio.mxlib.database.enums.DatabaseType;
 import io.github.linsminecraftstudio.mxlib.database.sql.conditions.Condition;
 
 public class DeleteSQL extends SQL {
@@ -20,7 +21,7 @@ public class DeleteSQL extends SQL {
     }
 
     @Override
-    String getSql() {
+    public String getSql(DatabaseType type) {
         sqlBuilder.setLength(0);
         sqlBuilder.append("DELETE FROM ").append(table);
 

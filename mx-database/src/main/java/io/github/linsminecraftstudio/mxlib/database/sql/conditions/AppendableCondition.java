@@ -33,6 +33,7 @@ class AppendableCondition implements Condition {
         for (Condition condition : multi) {
             params.addAll(condition.getParameters());
         }
+        System.out.println("params count:" + params.size());
         return params;
     }
 }

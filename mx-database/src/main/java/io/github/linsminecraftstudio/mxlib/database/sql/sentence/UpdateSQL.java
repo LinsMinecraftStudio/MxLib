@@ -1,5 +1,6 @@
 package io.github.linsminecraftstudio.mxlib.database.sql.sentence;
 
+import io.github.linsminecraftstudio.mxlib.database.enums.DatabaseType;
 import io.github.linsminecraftstudio.mxlib.database.sql.conditions.Condition;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class UpdateSQL extends SQL {
     }
 
     @Override
-    public String getSql() {
+    public String getSql(DatabaseType type) {
         sqlBuilder.setLength(0);
         sqlBuilder.append("UPDATE ").append(table).append(" SET ");
 

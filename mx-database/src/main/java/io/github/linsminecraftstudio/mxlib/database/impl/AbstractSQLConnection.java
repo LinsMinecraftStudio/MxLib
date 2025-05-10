@@ -18,8 +18,12 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Logger;
 
 abstract class AbstractSQLConnection implements DatabaseConnection {
+    private static final Logger LOGGER = Logger.getLogger("MXDatabase");
+
+    private boolean debug = false;
 
     abstract Connection getConnection() throws SQLException;
 
@@ -32,14 +36,14 @@ abstract class AbstractSQLConnection implements DatabaseConnection {
     @Override
     public boolean execute(SQL sql) throws SQLException {
         try (Connection connection = getConnection()) {
-            return sql.build(connection).execute();
+            return sql.build(connection, getType()).execute();
         }
     }
 
     @Override
     public ResultSet query(SelectSQL sql) throws SQLException {
         try (Connection connection = getConnection()) {
-            return sql.build(connection).executeQuery();
+            return sql.build(connection, getType()).executeQuery();
         }
     }
 
@@ -59,6 +63,10 @@ abstract class AbstractSQLConnection implements DatabaseConnection {
                 .from(table.name())
                 .where(condition)
                 .limit(1);
+
+        if (debug) {
+            LOGGER.info("Invoking SQL: " + sql.getSql(getType()));
+        }
 
         ResultSet query = query(sql);
         return ObjectSerializer.serializeOne(clazz, query);
@@ -86,6 +94,10 @@ abstract class AbstractSQLConnection implements DatabaseConnection {
 
         if (condition != null) {
             sql.where(condition);
+        }
+
+        if (debug) {
+            LOGGER.info("Invoking SQL: " + sql.getSql(getType()));
         }
 
         ResultSet set = query(sql);
@@ -158,7 +170,45 @@ abstract class AbstractSQLConnection implements DatabaseConnection {
             }
         }
 
-        sql.build(getConnection()).execute();
+        if (debug) {
+            LOGGER.info("Invoking SQL: " + sql.getSql(getType()));
+        }
+
+        sql.build(getConnection(), getType()).execute();
+    }
+
+    @Override
+    public <T> void insertObject(@NotNull Class<T> clazz, @NotNull T object) throws SQLException {
+        if (!clazz.isAnnotationPresent(Table.class)) {
+            throw new IllegalArgumentException("the class must be annotated with @Table");
+        }
+
+        Table table = clazz.getAnnotation(Table.class);
+        if (Strings.isNullOrEmpty(table.name())) {
+            throw new IllegalArgumentException("the table name cannot be empty");
+        }
+
+        List<Field> field = ObjectSerializer.getAllFields(clazz);
+
+        InsertSQL sql = SQL.insert().into(table.name());
+
+        for (Field f : field) {
+            if (f.isAnnotationPresent(Column.class)) {
+                String columnName = ObjectSerializer.getColumnName(f);
+                try {
+                    sql.value(columnName, f.get(object));
+                } catch (IllegalAccessException e) {
+                    //never happen
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        if (debug) {
+            LOGGER.info("Invoking SQL: " + sql.getSql(getType()));
+        }
+
+        sql.build(getConnection(), getType()).execute();
     }
 
     @Override
@@ -188,7 +238,11 @@ abstract class AbstractSQLConnection implements DatabaseConnection {
             }
         }
 
-        sql.build(getConnection()).execute();
+        if (debug) {
+            LOGGER.info("Invoking SQL: " + sql.getSql(getType()));
+        }
+
+        sql.build(getConnection(), getType()).execute();
     }
 
     @Override
@@ -219,7 +273,11 @@ abstract class AbstractSQLConnection implements DatabaseConnection {
 
         sql.where(condition);
 
-        sql.build(getConnection()).execute();
+        if (debug) {
+            LOGGER.info("Invoking SQL: " + sql.getSql(getType()));
+        }
+
+        sql.build(getConnection(), getType()).execute();
     }
 
     @Override
@@ -234,6 +292,16 @@ abstract class AbstractSQLConnection implements DatabaseConnection {
         }
 
         DeleteSQL sql = SQL.delete().from(table.name()).where(condition);
-        sql.build(getConnection()).execute();
+
+        if (debug) {
+            LOGGER.info("Invoking SQL: " + sql.getSql(getType()));
+        }
+
+        sql.build(getConnection(), getType()).execute();
+    }
+
+    @Override
+    public void setDebug(boolean debug) {
+        this.debug = debug;
     }
 }

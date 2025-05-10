@@ -1,8 +1,8 @@
 package io.github.linsminecraftstudio.mxlib.database.sql.sentence;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import io.github.linsminecraftstudio.mxlib.database.enums.DatabaseType;
+
+import java.util.*;
 
 public class InsertSQL extends SQL {
     private final Map<String, Object> values = new LinkedHashMap<>();
@@ -27,9 +27,15 @@ public class InsertSQL extends SQL {
     }
 
     @Override
-    String getSql() {
+    public String getSql(DatabaseType type) {
         sqlBuilder.setLength(0);
-        sqlBuilder.append("INSERT INTO ").append(table);
+        sqlBuilder.append("INSERT ");
+
+        if (upsert && type == DatabaseType.SQLITE) {
+            sqlBuilder.append("OR REPLACE ");
+        }
+
+        sqlBuilder.append("INTO ").append(table);
 
         if (!values.isEmpty()) {
             sqlBuilder.append(" (")
@@ -40,8 +46,15 @@ public class InsertSQL extends SQL {
             parameters.addAll(values.values());
         }
 
-        if (upsert) {
-            sqlBuilder.append(" ON DUPLICATE KEY UPDATE");
+        if (upsert && type == DatabaseType.MYSQL) {
+            sqlBuilder.append(" ON DUPLICATE KEY UPDATE ");
+
+            List<String> updates = new ArrayList<>();
+            for (String column : values.keySet()) {
+                updates.add(column + "=VALUES(" + column + ")");
+            }
+
+            sqlBuilder.append(String.join(", ", updates));
         }
 
         return sqlBuilder.toString();

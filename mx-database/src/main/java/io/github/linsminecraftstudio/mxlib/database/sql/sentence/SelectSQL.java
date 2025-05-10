@@ -1,6 +1,8 @@
 package io.github.linsminecraftstudio.mxlib.database.sql.sentence;
 
+import io.github.linsminecraftstudio.mxlib.database.enums.DatabaseType;
 import io.github.linsminecraftstudio.mxlib.database.enums.JoinType;
+import io.github.linsminecraftstudio.mxlib.database.enums.OrderType;
 import io.github.linsminecraftstudio.mxlib.database.sql.conditions.Condition;
 
 import java.sql.Connection;
@@ -135,7 +137,7 @@ public class SelectSQL extends SQL {
     }
 
     @Override
-    String getSql() {
+    public String getSql(DatabaseType type) {
         if (table == null) {
             throw new IllegalStateException("Table must be specified");
         }
@@ -143,6 +145,9 @@ public class SelectSQL extends SQL {
         if (columns.isEmpty()) {
             throw new IllegalStateException("At least one column must be selected");
         }
+
+        // 清空参数列表，确保每次调用getSql都是全新的
+        parameters.clear();
 
         StringBuilder sql = new StringBuilder("SELECT ");
 
@@ -200,18 +205,12 @@ public class SelectSQL extends SQL {
     }
 
     @Override
-    public List<Object> getParameters() {
-        return Collections.unmodifiableList(parameters);
-    }
-
-    @Override
-    public PreparedStatement build(Connection connection) throws SQLException {
-        String sql = getSql();
+    public PreparedStatement build(Connection connection, DatabaseType type) throws SQLException {
+        String sql = getSql(type);
         PreparedStatement stmt = connection.prepareStatement(sql);
 
-        int paramIndex = 1;
-        for (Object param : parameters) {
-            stmt.setObject(paramIndex++, param);
+        for (int i = 0; i < parameters.size(); i++) {
+            stmt.setObject(i + 1, parameters.get(i));
         }
 
         return stmt;
@@ -229,8 +228,4 @@ public class SelectSQL extends SQL {
     private record JoinClause(String table, String onClause, JoinType joinType) { }
     private record GroupBy(String column) { }
     private record OrderBy(String column, OrderType orderType) { }
-
-    public enum OrderType {
-        ASC, DESC
-    }
 }

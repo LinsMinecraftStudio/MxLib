@@ -1,10 +1,11 @@
 package io.github.linsminecraftstudio.mxlib.database.sql.sentence;
 
+import io.github.linsminecraftstudio.mxlib.database.enums.DatabaseType;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public abstract class SQL {
@@ -39,20 +40,33 @@ public abstract class SQL {
         return new CreateTableSQL();
     }
 
-    String getSql() {
-        return sqlBuilder.toString();
-    }
+    abstract String getSql(DatabaseType type);
 
-    List<Object> getParameters() {
-        return Collections.unmodifiableList(parameters);
-    }
+    public PreparedStatement build(Connection connection, DatabaseType type) throws SQLException {
+        parameters.clear();
+        String sql = getSql(type);
+        PreparedStatement stmt = connection.prepareStatement(sql);
 
-    public PreparedStatement build(Connection connection) throws SQLException {
-        PreparedStatement stmt = connection.prepareStatement(getSql());
+        int expectedParams = countParametersInSql(sql);
+        if (parameters.size() != expectedParams) {
+            throw new SQLException("Parameter count mismatch. Expected " + expectedParams +
+                    " but got " + parameters.size());
+        }
+
         for (int i = 0; i < parameters.size(); i++) {
             stmt.setObject(i + 1, parameters.get(i));
         }
+
         return stmt;
+    }
+
+    private int countParametersInSql(String sql) {
+        int count = 0;
+        int index = -1;
+        while ((index = sql.indexOf('?', index + 1)) != -1) {
+            count++;
+        }
+        return count;
     }
 
     void validateIdentifier(String identifier) {

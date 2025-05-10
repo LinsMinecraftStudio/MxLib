@@ -1,5 +1,7 @@
 package io.github.linsminecraftstudio.mxlib.database.sql.sentence;
 
+import io.github.linsminecraftstudio.mxlib.database.enums.DatabaseType;
+
 public class DropSQL extends SQL {
     private String name;
     private boolean ifExists;
@@ -39,7 +41,7 @@ public class DropSQL extends SQL {
     }
 
     @Override
-    public String getSql() {
+    public String getSql(DatabaseType type) {
         sqlBuilder.setLength(0);
 
         if (isTable) {

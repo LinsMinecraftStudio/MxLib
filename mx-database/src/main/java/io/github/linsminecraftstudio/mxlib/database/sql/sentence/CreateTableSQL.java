@@ -1,5 +1,7 @@
 package io.github.linsminecraftstudio.mxlib.database.sql.sentence;
 
+import io.github.linsminecraftstudio.mxlib.database.enums.DatabaseType;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -8,10 +10,10 @@ import java.util.stream.Collectors;
 
 public class CreateTableSQL extends SQL {
     private final Map<String, ColumnDefinition> columns = new LinkedHashMap<>();
-    private final List<String> primaryKeys = new ArrayList<>();
     private final List<ForeignKey> foreignKeys = new ArrayList<>();
     private final List<String> uniqueConstraints = new ArrayList<>();
     private final List<String> checks = new ArrayList<>();
+    private final List<String> primaryKeys = new ArrayList<>();
 
     private String tableName;
     private boolean ifNotExists;
@@ -36,7 +38,7 @@ public class CreateTableSQL extends SQL {
 
     public CreateTableSQL column(String name, String dataType, Integer length) {
         validateIdentifier(name);
-        columns.put(name, new ColumnDefinition(dataType, length, false, true, null, null));
+        columns.put(name, new ColumnDefinition(dataType, length, false, false, null));
         return this;
     }
 
@@ -63,10 +65,15 @@ public class CreateTableSQL extends SQL {
     public CreateTableSQL primaryKey(String... columnNames) {
         for (String columnName : columnNames) {
             validateIdentifier(columnName);
+            if (!columns.containsKey(columnName)) {
+                throw new IllegalArgumentException("Column not defined: " + columnName);
+            }
+
             primaryKeys.add(columnName);
         }
         return this;
     }
+
 
     public CreateTableSQL foreignKey(String column, String referenceTable, String referenceColumn) {
         validateIdentifier(column);
@@ -94,74 +101,18 @@ public class CreateTableSQL extends SQL {
         return this;
     }
 
-    @Override
-    String getSql() {
-        if (tableName == null) {
-            throw new IllegalStateException("Table name must be specified");
+    private String adaptTableOptions(String options, DatabaseType type) {
+        if (type == DatabaseType.SQLITE) {
+            return options.replaceAll("ENGINE=\\w+", "")
+                    .replaceAll("DEFAULT CHARSET=\\w+", "")
+                    .trim();
         }
-        if (columns.isEmpty()) {
-            throw new IllegalStateException("At least one column must be defined");
-        }
-
-        StringBuilder sql = new StringBuilder("CREATE TABLE ");
-        sql.append(tableName);
-
-        if (ifNotExists) {
-            sql.append(" IF NOT EXISTS");
-        }
-
-        sql.append(" (\n");
-
-        // Column definitions
-        List<String> columnDefs = columns.entrySet().stream()
-                .map(entry -> {
-                    String name = entry.getKey();
-                    ColumnDefinition def = entry.getValue();
-                    return buildColumnDefinition(name, def);
-                })
-                .collect(Collectors.toList());
-
-        // Primary key
-        if (!primaryKeys.isEmpty()) {
-            columnDefs.add("  PRIMARY KEY (" + String.join(", ", primaryKeys) + ")");
-        }
-
-        // Unique constraints
-        if (!uniqueConstraints.isEmpty()) {
-            columnDefs.add("  UNIQUE (" + String.join(", ", uniqueConstraints) + ")");
-        }
-
-        // Foreign keys
-        for (ForeignKey fk : foreignKeys) {
-            columnDefs.add(String.format(
-                    "  FOREIGN KEY (%s) REFERENCES %s(%s)",
-                    fk.column, fk.referenceTable, fk.referenceColumn
-            ));
-        }
-
-        // Check constraints
-        for (String check : checks) {
-            columnDefs.add("  CHECK (" + check + ")");
-        }
-
-        sql.append(String.join(",\n", columnDefs));
-        sql.append("\n)");
-
-        if (tableOptions != null && !tableOptions.isEmpty()) {
-            sql.append(" ").append(tableOptions);
-        }
-
-        return sql.toString();
+        return options;
     }
 
     @Override
-    public List<Object> getParameters() {
-        return Collections.emptyList(); // CREATE TABLE typically has no parameters
-    }
-
-    @Override
-    public PreparedStatement build(Connection connection) throws SQLException {
-        return connection.prepareStatement(getSql());
+    public PreparedStatement build(Connection connection, DatabaseType type) throws SQLException {
+        return connection.prepareStatement(getSql(type));
     }
 
     private ColumnDefinition getColumn(String columnName) {
@@ -170,29 +121,6 @@ public class CreateTableSQL extends SQL {
             throw new IllegalArgumentException("Column not defined: " + columnName);
         }
         return column;
-    }
-
-    private String buildColumnDefinition(String name, ColumnDefinition def) {
-        StringBuilder sb = new StringBuilder("  ");
-        sb.append(name).append(" ").append(def.dataType);
-
-        if (def.length != null) {
-            sb.append("(").append(def.length).append(")");
-        }
-
-        if (!def.nullable) {
-            sb.append(" NOT NULL");
-        }
-
-        if (def.defaultValue != null) {
-            sb.append(" DEFAULT ").append(def.defaultValue);
-        }
-
-        if (def.autoIncrement) {
-            sb.append(" AUTO_INCREMENT");
-        }
-
-        return sb.toString();
     }
 
     protected void validateIdentifier(String identifier) {
@@ -204,22 +132,99 @@ public class CreateTableSQL extends SQL {
         }
     }
 
+    @Override
+    public String getSql(DatabaseType type) {
+        if (tableName == null) {
+            throw new IllegalStateException("Table name must be specified");
+        }
+
+        if (columns.isEmpty()) {
+            throw new IllegalStateException("At least one column must be defined");
+        }
+
+        StringBuilder sql = new StringBuilder("CREATE TABLE");
+
+        if (ifNotExists) {
+            sql.append(" IF NOT EXISTS");
+        }
+
+        sql.append(" ").append(tableName).append(" (\n");
+
+        List<String> columnDefs = columns.entrySet().stream()
+                .map(entry -> {
+                    String name = entry.getKey();
+                    ColumnDefinition def = entry.getValue();
+                    return buildColumnDefinition(name, def, type);
+                })
+                .collect(Collectors.toList());
+
+        if (!primaryKeys.isEmpty()) {
+            columnDefs.add("  PRIMARY KEY (" + String.join(", ", primaryKeys) + ")");
+        }
+
+        if (!uniqueConstraints.isEmpty()) {
+            columnDefs.add("  UNIQUE (" + String.join(", ", uniqueConstraints) + ")");
+        }
+
+        for (ForeignKey fk : foreignKeys) {
+            columnDefs.add(String.format(
+                    "  FOREIGN KEY (%s) REFERENCES %s(%s)",
+                    fk.column, fk.referenceTable, fk.referenceColumn
+            ));
+        }
+
+        for (String check : checks) {
+            columnDefs.add("  CHECK (" + check + ")");
+        }
+
+        sql.append(String.join(",\n", columnDefs));
+        sql.append("\n)");
+
+        if (tableOptions != null && !tableOptions.isEmpty()) {
+            sql.append(" ").append(adaptTableOptions(tableOptions, type));
+        }
+
+        return sql.toString();
+    }
+
+    private String buildColumnDefinition(String name, ColumnDefinition def, DatabaseType type) {
+        StringBuilder colDef = new StringBuilder("  ").append(name).append(" ").append(def.dataType);
+
+        if (def.autoIncrement) {
+            if (type == DatabaseType.MYSQL) {
+                colDef.append(" AUTO_INCREMENT");
+            } else if (type == DatabaseType.SQLITE) {
+                colDef.append(" AUTOINCREMENT");
+            }
+        }
+
+        if (!primaryKeys.contains(name)) {
+            if (!def.nullable) {
+                colDef.append(" NOT NULL");
+            }
+        }
+
+        if (def.defaultValue != null) {
+            colDef.append(" DEFAULT ").append(def.defaultValue);
+        }
+
+        return colDef.toString();
+    }
+
     private static class ColumnDefinition {
         final String dataType;
         final Integer length;
         boolean nullable;
         boolean autoIncrement;
         String defaultValue;
-        String comment;
 
         ColumnDefinition(String dataType, Integer length, boolean nullable,
-                         boolean autoIncrement, String defaultValue, String comment) {
+                         boolean autoIncrement, String defaultValue) {
             this.dataType = dataType;
             this.length = length;
             this.nullable = nullable;
             this.autoIncrement = autoIncrement;
             this.defaultValue = defaultValue;
-            this.comment = comment;
         }
     }
 

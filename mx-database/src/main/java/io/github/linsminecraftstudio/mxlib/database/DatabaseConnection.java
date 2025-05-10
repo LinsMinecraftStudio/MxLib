@@ -53,6 +53,14 @@ public interface DatabaseConnection {
     /**
      * Upsert object
      * @param clazz the class of the object
+     * @param object the object to insert
+     * @param <T> the type
+     */
+    <T> void insertObject(@NotNull Class<T> clazz, @NotNull T object) throws SQLException;
+
+    /**
+     * Upsert object
+     * @param clazz the class of the object
      * @param object the object to upsert
      * @param <T> the type
      */
@@ -77,7 +85,13 @@ public interface DatabaseConnection {
 
     /**
      * @see DatabaseType
-     * @return The type of the database connection.
+     * @return the database connection.
      */
     @NotNull DatabaseType getType();
+
+    /**
+     * Set debug mode
+     * @param debug true to enable debug mode, false to turn off debug mode.
+     */
+    void setDebug(boolean debug);
 }

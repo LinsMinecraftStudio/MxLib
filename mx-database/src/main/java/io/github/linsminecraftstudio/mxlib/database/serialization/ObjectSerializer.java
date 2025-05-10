@@ -157,7 +157,7 @@ public class ObjectSerializer {
         if (javaType == String.class)
             return "TEXT";
         if (javaType == int.class || javaType == Integer.class)
-            return "INT";
+            return "INTEGER";
         if (javaType == long.class || javaType == Long.class)
             return "BIGINT";
         if (javaType == boolean.class || javaType == Boolean.class)
