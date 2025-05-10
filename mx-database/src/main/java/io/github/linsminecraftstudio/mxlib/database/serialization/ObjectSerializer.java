@@ -2,6 +2,7 @@ package io.github.linsminecraftstudio.mxlib.database.serialization;
 
 import io.github.linsminecraftstudio.mxlib.database.serialization.annotations.Column;
 import org.apache.commons.lang3.SerializationException;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -80,15 +81,20 @@ public class ObjectSerializer {
         }
     }
 
-    private static String getColumnName(Field field) {
+    @Nullable
+    public static String getColumnName(Field field) {
         if (field.isAnnotationPresent(Column.class)) {
             Column column = field.getAnnotation(Column.class);
             if (column != null) {
+                if (column.name().equals(Column.AUTO_NAMED)) {
+                    return field.getName();
+                }
+
                 return column.name();
             }
         }
 
-        return field.getName();
+        return null;
     }
 
     private static Object getValueFromResultSet(ResultSet set, String columnName, Class<?> type) throws SQLException {

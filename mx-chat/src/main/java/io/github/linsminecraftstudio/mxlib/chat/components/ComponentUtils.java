@@ -7,6 +7,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
 public class ComponentUtils {
     public static void sendClipboard(Player player, String message, String beingCopied) {
         sendClipboard(player, WrappedComponent.of(message), beingCopied);
@@ -38,5 +42,23 @@ public class ComponentUtils {
         Component component = message.asComponent();
         component = component.hoverEvent(entity);
         return component;
+    }
+
+    public static void addLoreToItem(ItemStack item, boolean appendEmptyLineFirst, ComponentLike... lore) {
+        item.editMeta(meta -> {
+            List<Component> originalLore = meta.lore();
+            List<Component> loreList = new ArrayList<>();
+            if (originalLore != null) {
+                loreList.addAll(originalLore);
+            }
+
+            if (appendEmptyLineFirst) {
+                loreList.add(Component.empty());
+            }
+
+            loreList.addAll(Stream.of(lore).map(ComponentLike::asComponent).toList());
+
+            meta.lore(loreList);
+        });
     }
 }

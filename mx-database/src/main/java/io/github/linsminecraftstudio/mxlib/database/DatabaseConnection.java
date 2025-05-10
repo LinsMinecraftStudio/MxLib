@@ -21,6 +21,8 @@ public interface DatabaseConnection {
 
     void createTableByClass(Class<?> clazz) throws SQLException;
 
+    <T> void insertObject(Class<T> clazz, T object) throws SQLException;
+
     boolean ping() throws SQLException;
 
     void commit() throws SQLException;

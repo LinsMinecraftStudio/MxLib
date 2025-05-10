@@ -8,7 +8,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Column {
-    String name();
+    String AUTO_NAMED = "AUTO_FOLLOW_FIELD_NAME";
+
+    String name() default AUTO_NAMED;
 
     String defaultValue() default "";
 

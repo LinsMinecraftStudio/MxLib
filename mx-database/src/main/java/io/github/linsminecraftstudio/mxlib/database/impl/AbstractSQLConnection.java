@@ -9,6 +9,7 @@ import io.github.linsminecraftstudio.mxlib.database.serialization.ObjectSerializ
 import io.github.linsminecraftstudio.mxlib.database.serialization.annotations.PrimaryKey;
 import io.github.linsminecraftstudio.mxlib.database.serialization.annotations.Table;
 import io.github.linsminecraftstudio.mxlib.database.sql.sentence.CreateTableSQL;
+import io.github.linsminecraftstudio.mxlib.database.sql.sentence.InsertSQL;
 import io.github.linsminecraftstudio.mxlib.database.sql.sentence.SQL;
 import io.github.linsminecraftstudio.mxlib.database.sql.sentence.SelectSQL;
 
@@ -123,23 +124,54 @@ abstract class AbstractSQLConnection implements DatabaseConnection {
                     Class<?> type = f.getType();
 
                     String sqlType = ObjectSerializer.getSqlType(type);
-                    sql.column(column.name(), sqlType);
+                    String columnName = ObjectSerializer.getColumnName(f);
+                    sql.column(columnName, sqlType);
 
                     if (f.isAnnotationPresent(AutoIncrement.class)) {
-                        sql.autoIncrement(column.name());
+                        sql.autoIncrement(columnName);
                     }
 
                     if (f.isAnnotationPresent(PrimaryKey.class)) {
-                        sql.primaryKey(column.name());
+                        sql.primaryKey(columnName);
                     }
 
                     if (!column.nullable()) {
-                        sql.notNull(column.name());
+                        sql.notNull(columnName);
                     }
 
                     if (!Strings.isNullOrEmpty(column.defaultValue())) {
-                        sql.defaultValue(column.name(), column.defaultValue());
+                        sql.defaultValue(columnName, column.defaultValue());
                     }
+                }
+            }
+        }
+
+        sql.build(getConnection()).execute();
+    }
+
+    @Override
+    public <T> void insertObject(Class<T> clazz, T object) throws SQLException {
+        if (!clazz.isAnnotationPresent(Table.class)) {
+            throw new IllegalArgumentException("the class must be annotated with @Table");
+        }
+
+        Table table = clazz.getAnnotation(Table.class);
+        if (Strings.isNullOrEmpty(table.name())) {
+            throw new IllegalArgumentException("the table name cannot be empty");
+        }
+
+        List<Field> field = ObjectSerializer.getAllFields(clazz);
+
+        InsertSQL sql = SQL.upsert().into(table.name());
+
+        for (Field f : field) {
+            if (f.isAnnotationPresent(Column.class)) {
+                String columnName = ObjectSerializer.getColumnName(f);
+                try {
+                    sql.value(columnName, f.get(object));
+                } catch (IllegalAccessException e) {
+                    //never happen
+                    throw new RuntimeException(e);
                 }
             }
         }

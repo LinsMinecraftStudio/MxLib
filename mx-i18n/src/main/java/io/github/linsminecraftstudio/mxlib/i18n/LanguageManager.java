@@ -137,7 +137,9 @@ public class LanguageManager {
      * Get the message with the specified key and arguments in the player's language.
      * @param player The player to get the language from.
      * @param key The key of the message.
-     * @param args The arguments of the message (You should use {0}, {1}, etc. to specify the arguments in the raw message, see {@link java.text.MessageFormat}).
+     * @param args The arguments of the message
+     *             (Use {0}, {1} or more like that to specify the arguments in the raw message,
+     *             see {@link java.text.MessageFormat}).
      * @return The message with the specified key and arguments in the player's language.
      */
     public WrappedComponent getMsg(Player player, String key, Object... args) {
@@ -148,7 +150,9 @@ public class LanguageManager {
      * Get the message with the specified key and arguments in the player's language.
      * @param language The language to get the message from.
      * @param key The key of the message.
-     * @param args The arguments of the message (You should use {0}, {1}, etc. to specify the arguments in the raw message, see {@link java.text.MessageFormat}).
+     * @param args The arguments of the message
+     *             (Use {0}, {1} or more like that to specify the arguments in the raw message,
+     *             see {@link java.text.MessageFormat}).
      * @return The message with the specified key and arguments in the player's language.
      */
     public WrappedComponent getMsg(Language language, String key, Object... args) {
@@ -182,7 +186,7 @@ public class LanguageManager {
      * @param sender The sender to send the message to.
      * @param key The key of the message.
      * @param args The arguments of the message
-     *             (You should use {0}, {1}, ...
+     *             (Use {0}, {1} or more like that
      *             to specify the arguments in the raw message, see {@link java.text.MessageFormat}).
      * @see java.text.MessageFormat
      */
@@ -195,7 +199,7 @@ public class LanguageManager {
      * @param player The player to send the message to.
      * @param key The key of the message.
      * @param args The arguments of the message
-     *             (You should use {0},{1}, ...
+     *             (Use {0}, {1} or more like that
      *             to specify the arguments in the raw message, see {@link java.text.MessageFormat}).
      * @see java.text.MessageFormat
      */

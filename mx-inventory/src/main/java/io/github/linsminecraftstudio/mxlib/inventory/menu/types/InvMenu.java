@@ -4,7 +4,7 @@ import io.github.linsminecraftstudio.mxlib.chat.components.WrappedComponent;
 import io.github.linsminecraftstudio.mxlib.inventory.InventoryUtils;
 import io.github.linsminecraftstudio.mxlib.inventory.menu.MxInventoryHolder;
 import io.github.linsminecraftstudio.mxlib.inventory.menu.drawers.MenuDrawer;
-import io.github.linsminecraftstudio.mxlib.inventory.menu.filler.MenuFiller;
+import io.github.linsminecraftstudio.mxlib.inventory.menu.filler.FillType;
 import io.github.linsminecraftstudio.mxlib.inventory.menu.handlers.MxMenuCloseHandler;
 import io.github.linsminecraftstudio.mxlib.inventory.menu.handlers.MxMenuDragHandler;
 import io.github.linsminecraftstudio.mxlib.inventory.menu.handlers.MxMenuOpenHandler;
@@ -17,13 +17,10 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Builder
 public class InvMenu extends MxInventoryHolder {
@@ -115,8 +112,41 @@ public class InvMenu extends MxInventoryHolder {
         }
     }
 
-    public MenuFiller getFiller() {
-        return new MenuFiller(this);
+    public void fill(FillType type, MxMenuItem item) {
+        switch (type) {
+            case FULL -> {
+                for (int i = 0; i < this.getSize(); i++) {
+                    if (this.getItem(i) == null) {
+                        this.setItem(i, item);
+                    }
+                }
+            }
+            case TOP_LINE -> {
+                for (int i = 0; i < this.getSize(); i++) {
+                    if (i < 9) {
+                        if (this.getItem(i) == null) {
+                            this.setItem(i, item);
+                        }
+                    }
+                }
+            }
+            case BOTTOM_LINE -> {
+                for (int i = this.getSize() - 9; i < 9; i++) {
+                    if (this.getItem(i) == null) {
+                        this.setItem(i, item);
+                    }
+                }
+            }
+            case NO_TOP_AND_BOTTOM -> {
+                for (int i = 0; i < this.getSize(); i++) {
+                    if (i > 8 && i < this.getSize() - 9) {
+                        if (this.getItem(i) == null) {
+                            this.setItem(i, item);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void initInventory() {

@@ -14,6 +14,7 @@ import net.kyori.adventure.title.Title;
 import net.kyori.adventure.util.RGBLike;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -277,6 +278,13 @@ public class WrappedComponent implements ComponentLike, Cloneable {
     public WrappedComponent style(Style style) {
         component = component.style(style);
         return this;
+    }
+
+    /**
+     * Sets the display name of an item stack to the component.
+     */
+    public void asItemName(ItemStack item) {
+        item.editMeta(meta -> meta.displayName(component));
     }
 
     @Override

@@ -3,7 +3,7 @@ package io.github.linsminecraftstudio.mxlib.database.sql.conditions;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CompositeCondition implements Condition {
+class CompositeCondition implements Condition {
     private final Condition left;
     private final Condition right;
     private final String operator;

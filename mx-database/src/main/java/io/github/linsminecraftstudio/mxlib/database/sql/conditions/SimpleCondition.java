@@ -3,7 +3,7 @@ package io.github.linsminecraftstudio.mxlib.database.sql.conditions;
 import java.util.Collections;
 import java.util.List;
 
-public class SimpleCondition implements Condition {
+class SimpleCondition implements Condition {
     private final String column;
     private final String operator;
     private final Object value;
