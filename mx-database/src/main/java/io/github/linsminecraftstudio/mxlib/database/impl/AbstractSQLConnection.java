@@ -8,10 +8,10 @@ import io.github.linsminecraftstudio.mxlib.database.serialization.annotations.Co
 import io.github.linsminecraftstudio.mxlib.database.serialization.ObjectSerializer;
 import io.github.linsminecraftstudio.mxlib.database.serialization.annotations.PrimaryKey;
 import io.github.linsminecraftstudio.mxlib.database.serialization.annotations.Table;
-import io.github.linsminecraftstudio.mxlib.database.sql.sentence.CreateTableSQL;
-import io.github.linsminecraftstudio.mxlib.database.sql.sentence.InsertSQL;
-import io.github.linsminecraftstudio.mxlib.database.sql.sentence.SQL;
-import io.github.linsminecraftstudio.mxlib.database.sql.sentence.SelectSQL;
+import io.github.linsminecraftstudio.mxlib.database.sql.conditions.Condition;
+import io.github.linsminecraftstudio.mxlib.database.sql.sentence.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -24,7 +24,7 @@ abstract class AbstractSQLConnection implements DatabaseConnection {
     abstract Connection getConnection() throws SQLException;
 
     @Override
-    public abstract DatabaseType getType();
+    public abstract @NotNull DatabaseType getType();
 
     @Override
     public abstract void close();
@@ -44,7 +44,7 @@ abstract class AbstractSQLConnection implements DatabaseConnection {
     }
 
     @Override
-    public <T> T selectOne(Class<T> clazz) throws SQLException {
+    public <T> @NotNull T selectOne(Class<T> clazz, @NotNull Condition condition) throws SQLException {
         if (!clazz.isAnnotationPresent(Table.class)) {
             throw new IllegalArgumentException("the class must be annotated with @Table");
         }
@@ -57,13 +57,20 @@ abstract class AbstractSQLConnection implements DatabaseConnection {
         SelectSQL sql = SQL.select()
                 .allColumns()
                 .from(table.name())
+                .where(condition)
                 .limit(1);
+
         ResultSet query = query(sql);
         return ObjectSerializer.serializeOne(clazz, query);
     }
 
     @Override
-    public <T> List<T> selectMulti(Class<T> clazz) throws SQLException {
+    public <T> @NotNull List<T> selectMulti(@NotNull Class<T> clazz) throws SQLException {
+        return selectMulti(clazz, null);
+    }
+
+    @Override
+    public <T> @NotNull List<T> selectMulti(@NotNull Class<T> clazz, @Nullable Condition condition) throws SQLException {
         if (!clazz.isAnnotationPresent(Table.class)) {
             throw new IllegalArgumentException("the class must be annotated with @Table");
         }
@@ -76,6 +83,10 @@ abstract class AbstractSQLConnection implements DatabaseConnection {
         SelectSQL sql = SQL.select()
                 .allColumns()
                 .from(table.name());
+
+        if (condition != null) {
+            sql.where(condition);
+        }
 
         ResultSet set = query(sql);
         return ObjectSerializer.serializeMulti(clazz, set);
@@ -103,7 +114,7 @@ abstract class AbstractSQLConnection implements DatabaseConnection {
     }
 
     @Override
-    public void createTableByClass(Class<?> clazz) throws SQLException {
+    public void createTableByClass(@NotNull Class<?> clazz) throws SQLException {
         if (!clazz.isAnnotationPresent(Table.class)) {
             throw new IllegalArgumentException("the class must be annotated with @Table");
         }
@@ -125,6 +136,7 @@ abstract class AbstractSQLConnection implements DatabaseConnection {
 
                     String sqlType = ObjectSerializer.getSqlType(type);
                     String columnName = ObjectSerializer.getColumnName(f);
+
                     sql.column(columnName, sqlType);
 
                     if (f.isAnnotationPresent(AutoIncrement.class)) {
@@ -150,7 +162,7 @@ abstract class AbstractSQLConnection implements DatabaseConnection {
     }
 
     @Override
-    public <T> void insertObject(Class<T> clazz, T object) throws SQLException {
+    public <T> void upsertObject(@NotNull Class<T> clazz, @NotNull T object) throws SQLException {
         if (!clazz.isAnnotationPresent(Table.class)) {
             throw new IllegalArgumentException("the class must be annotated with @Table");
         }
@@ -176,6 +188,52 @@ abstract class AbstractSQLConnection implements DatabaseConnection {
             }
         }
 
+        sql.build(getConnection()).execute();
+    }
+
+    @Override
+    public <T> void updateObject(@NotNull Class<T> clazz, @NotNull T object, @NotNull Condition condition) throws SQLException {
+        if (!clazz.isAnnotationPresent(Table.class)) {
+            throw new IllegalArgumentException("the class must be annotated with @Table");
+        }
+
+        Table table = clazz.getAnnotation(Table.class);
+        if (Strings.isNullOrEmpty(table.name())) {
+            throw new IllegalArgumentException("the table name cannot be empty");
+        }
+
+        List<Field> field = ObjectSerializer.getAllFields(clazz);
+
+        UpdateSQL sql = SQL.update().table(table.name());
+        for (Field f : field) {
+            if (f.isAnnotationPresent(Column.class)) {
+                String columnName = ObjectSerializer.getColumnName(f);
+                try {
+                    sql.set(columnName, f.get(object));
+                } catch (IllegalAccessException e) {
+                    //never happen
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        sql.where(condition);
+
+        sql.build(getConnection()).execute();
+    }
+
+    @Override
+    public void deleteObject(@NotNull Class<?> clazz, @NotNull Condition condition) throws SQLException {
+        if (!clazz.isAnnotationPresent(Table.class)) {
+            throw new IllegalArgumentException("the class must be annotated with @Table");
+        }
+
+        Table table = clazz.getAnnotation(Table.class);
+        if (Strings.isNullOrEmpty(table.name())) {
+            throw new IllegalArgumentException("the table name cannot be empty");
+        }
+
+        DeleteSQL sql = SQL.delete().from(table.name()).where(condition);
         sql.build(getConnection()).execute();
     }
 }

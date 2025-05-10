@@ -33,12 +33,12 @@ public class Conditions {
         return new SimpleCondition(column, "IS NOT", null);
     }
 
-    public static Condition and(Condition left, Condition right) {
-        return new CompositeCondition(left, right, "AND");
+    public static Condition and(Condition... ands) {
+        return new AppendableCondition(ands, "AND");
     }
 
-    public static Condition or(Condition left, Condition right) {
-        return new CompositeCondition(left, right, "OR");
+    public static Condition or(Condition... ors) {
+        return new AppendableCondition(ors, "OR");
     }
 
     public static Condition in(String column, List<?> values) {

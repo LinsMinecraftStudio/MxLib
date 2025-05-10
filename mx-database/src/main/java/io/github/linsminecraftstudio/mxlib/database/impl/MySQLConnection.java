@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.github.linsminecraftstudio.mxlib.database.DatabaseParameters;
 import io.github.linsminecraftstudio.mxlib.database.enums.DatabaseType;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -40,7 +41,7 @@ class MySQLConnection extends AbstractSQLConnection {
     }
 
     @Override
-    public DatabaseType getType() {
+    public @NotNull DatabaseType getType() {
         return DatabaseType.MYSQL;
     }
 }
