@@ -16,7 +16,3 @@ MxLib is a Minecraft plugin develop library in Java based on the [Paper API](htt
    * Version: 1.0.9*
    * Features:
      - Language file management and translation.
-* MxDatabase API
-   * Version: 1.0.9*
-   * Features:
-     - MySQL/MariaDB/SQLite database connection and management.

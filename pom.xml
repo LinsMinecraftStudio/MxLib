@@ -15,7 +15,6 @@
         <module>mx-inventory</module>
         <module>mx-chat</module>
         <module>mx-i18n</module>
-        <module>mx-database</module>
 
         <module>example</module>
         <module>packaging-jar</module>
